@@ -1,46 +1,85 @@
 //数据库模块
-const mysql =require("mysql");  //加载mysql模块
-const config =require("../util/config");//加载配置文件
+const mysql = require("mysql");  //加载mysql模块
+const config = require("../util/config");  //加载配置文件
 
+//创建数据库连接
 function conn(){
-  let connction=  mysql.createConnection({
+  let connection = mysql.createConnection({
     host:config.database.ip,
     user:config.database.username,
     password:config.database.password,
     database:config.database.dbname
   });
-  connction.connect();
-  return  connction;
+  connection.connect(function(err){
+    if(err){
+      throw err;
+      return;
+    }
+  });
+  return connection;
 }
- 
-//查询--并列精确查找
- function getAll(table,{where=0,order="",limit=0}={}){
-    let sql ="select * from `"+table+"`";
-    if(where){  //where条件
-      sql += " where";
-      for(let k in where){
-          sql += " `"+k+"`='"+where[k]+"' and";
-      }
-      sql=sql.slice(0,sql.length-3);//去掉最后的"and"
-    }
-    if(order){
-      sql += " order by ";
-      for(let k in order){
-        sql += "`"+k+"` "+order[k]+",";
-      }
-      sql = sql.slice(0,sql.length-1);//去掉最后的","
-    }
-    if(limit){
-      sql +=" limit ";
-      sql += limit.start ? limit.start+"," : "";
-      sql += limit.len ? limit.len : 1;
-    }
-    return  new Promise(resolve=>{
-    // console.log(sql);
-    conn().query(sql,(err,results,fileds)=>{
+
+//执行sql
+function excute(sql){
+  return new Promise((resolve,reject)=>{
+    let connection = conn(); //创建连接
+    connection.query(sql,(error,results,fileds)=>{
+      if(error)
+        reject(error);
+      else
         resolve(results);
     })
-   });
-  }
+    connection.end();  //断开连接
+  });
+}
 
-module.exports ={getAll}
+//查询--并列精确查找
+function getAll(table,{where=0,order="",limit=0}={}){
+  let sql = "SELECT * FROM `"+table+"`";
+  if(where){  //where条件
+    sql += " WHERE";
+    for(let k in where){
+      sql += " `"+k+"`='"+where[k]+"' AND";
+    }
+    sql = sql.slice(0,sql.length-3);  //去掉最后的"AND"
+  }
+  if(order){  //order排序
+    sql += " ORDER BY ";
+    for(let k in order){
+      sql += "`"+k+"` "+order[k]+",";
+    }
+    sql = sql.slice(0,sql.length-1);  //去掉最后的","
+  }
+  if(limit){ //limit限定条数
+    sql += " LIMIT ";
+    sql += limit.start ? limit.start+"," : "";
+    sql += limit.len ? limit.len : 1;
+  }
+  return excute(sql);
+}
+
+//新增
+function insert(table,data){
+  console.log(data);
+  let cols = "";
+  let vals = "";
+  for(let k in data){
+    cols += "`"+k+"`,";
+    vals += '"'+data[k]+'",';
+  }
+  cols = cols.slice(0,cols.length-1);  //去掉最后的,
+  vals = vals.slice(0,vals.length-1);  //去掉最后的,
+  let sql = "INSERT INTO `"+table+"`("+cols+") VALUES ("+vals+")";
+  return excute(sql);
+}
+
+
+//删除
+function del(table,data){
+  console.log(data);
+  cols = cols.slice(0,cols.length-1);  //去掉最后的,
+  vals = vals.slice(0,vals.length-1);  //去掉最后的,
+  let sql = "INSERT INTO `"+table+"` ";
+  return excute(sql);
+}
+module.exports = {getAll,insert,del}

@@ -68,6 +68,61 @@ function show(path,res){
 module.exports={show}
 ```
 
+#### 加载静态资源
+
+```js
+const paths = require("path");
+const fs =require('fs');
+async function show(path,res){
+   //静态资源文件
+   if(path.startWith("public")){
+     let suffix = path.slice(path.lastIndexOf(".")+1);//获取静态资源文件后缀
+     //文件类型和MIME Type对应关系
+     let mimeType = new Map([
+      ["jpg","image/jpeg"],
+      ["jpeg","image/jpeg"],
+      ["png","image/png"],
+      ["gif","image/gif"],
+      ["css","text/css"],
+      ["js","text/javascript"],
+      // ["ttf",],
+      ["mp3","audo/x-mpeg"],
+      ["mp4","video/mp4"]
+    ]);
+     //根据后缀找到相应对应的文件类型
+       res.writeHead(200,{"Content-Type":"text/html;charset=UTF-8"})；
+       let filePath =paths.join(__dirname,"../../",path);
+       let result = await new Promise((resolve,reject)=>{
+           //读取模板内容(异步)
+           fs.readFile(filePath,(err,data)=>{
+               if(err)
+                 reject(err);//读取失败返回错误
+               else
+                 resolve(data);//读取成功返回数据
+           })；
+       })
+        res.write(result);
+        res.end();
+}else{
+  let pathMap =new Map([
+    ["/admin","admin.login(res)"],  //登录页
+    ["/admin/login","admin.login(res)"],//登陆页
+    ["/","index.index(res)"]
+  ]);//路径和控制器的对应关系
+  if(pathMap.has(path)){//查看路径是否错误
+    //执行路径对应的方法
+    eval(pathMap.get(path));
+  }else{
+    //404
+    // res.writeHead(404,{"Content-type":"text/html;charset=UTF-8"});
+    // res.write("<h1>页面跑路了...</h1>");
+    // res.end();
+    show1.returnFile(res,paths.join(__dirname,"../../","tpl/404.html"),"text/html");
+  }
+}
+}
+```
+
 #### 用户模块
 
 ##### 密码加密

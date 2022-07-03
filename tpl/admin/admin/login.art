@@ -1,8 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>锤子商城后台-登录</title>
+<title>商城后台-登录</title>
 <!--                       CSS                       -->
 <!-- Reset Stylesheet -->
 <link rel="stylesheet" href="{{baseurl}}public/admin/css/reset.css" type="text/css" media="screen" />
@@ -24,28 +23,27 @@
 <body id="login">
 <div id="login-wrapper" class="png_bg">
   <div id="login-top">
-    <h1>锤子商城后台</h1>
+    <h1>Simpla Admin</h1>
     <!-- Logo (221px width) -->
     <a href="http://www.865171.cn"><img id="logo" src="{{baseurl}}public/admin/images/logo-chuizi.png" alt="Simpla Admin logo" /></a> </div>
   <!-- End #logn-top -->
   <div id="login-content">
-    <form action="http://localhost/admin" method="post">
+    <form action="http://localhost/admin/login" method="post">
       <div class="notification information png_bg">
         <div> 请在下方输入用户名及密码 </div>
       </div>
       <p>
-        <label>用户名:</label>
+        <label>用户名：</label>
         <input class="text-input" type="text" name="uname" />
       </p>
       <div class="clear"></div>
       <p>
-        <label>密码:</label>
-        <input class="text-input" type="password" name="pwd"/>
+        <label>密码：</label>
+        <input class="text-input" type="password" name="pwd" />
       </p>
       <div class="clear"></div>
       <p id="remember-password">
-        <!-- 复选框最好给一个value 利于后台提交 -->
-        <input type="checkbox" name="remember"  value="1"/>
+        <input type="checkbox" name="remember" value="1" />
         记住我 </p>
       <div class="clear"></div>
       <p>
@@ -59,17 +57,23 @@
 </body>
 </html>
 <script>
-  $("form").submit(()=>{
+$("form").submit(()=>{
     //触发ajax
     $.ajax({
-      type:post,
+      type:"post",
       url:"{{baseurl}}admin/ajaxLogin",
-      data:$(form).serialize(),
+      data:$("form").serialize(),
       dataType:"json",
       success:function(data){
-        console.log(data);
+         if (data.errCode == 1) {
+            alert(`${data.errMsg}`)
+            window.location.href = "{{baseurl}}admin/chart"
+        }else {
+            alert(`${data.errMsg}`)
+        }
       }
     });
     return false;
   })
+
 </script>

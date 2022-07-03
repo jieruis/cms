@@ -9,7 +9,7 @@ function createServer(){
     //req:用户请求  res:服务器应答
     // let reqUrl=url.parse(req.url);//旧版URL
     let reqUrl=new URL(req.url,config.baseurl);//新版URL
-     console.log(reqUrl);
+    //  console.log(reqUrl);
     router.show(reqUrl.pathname,res);
     // res.writeHead(200,{"Content-type":"text/html;charset='UTF-8'"});
     // res.write("<h1>hello</h1>"); //应答的主体内容

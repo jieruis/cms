@@ -1,5 +1,4 @@
 //入口文件
+const server = require("./module/init/server");  //服务器模块
 
-const server =require("./module/init/server");//服务器模板
-
-server.start();
+server.start(); //开启服务器
